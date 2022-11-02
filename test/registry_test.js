@@ -6,57 +6,69 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Lock", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
-  async function deployOneYearLockFixture() {
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const ONE_GWEI = 1_000_000_000;
-
-    const lockedAmount = ONE_GWEI;
-    const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS;
-
-    // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await ethers.getSigners();
-
-    const Lock = await ethers.getContractFactory("Lock");
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-    return { lock, unlockTime, lockedAmount, owner, otherAccount };
+describe("Registry", async function () {
+  async function deploy() {
+    const signer = await ethers.getSigner();
+    const Registry = await ethers.getContractFactory("Registry");
+    const registry = await Registry.deploy();
+    return { registry, signer };
   }
+  describe("test", function () {
+    it("Should pass all the tests", async function () {
+      const { registry } = await deploy();
+      const type = '0x00';
+      const LENGTH = 10;
+      const HALF = LENGTH/2;
+      let hash = [];
+      let desiredResult = [];
 
-  describe("Deployment", function () {
-    it("Should set the right unlockTime", async function () {
-      const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
+      // create a random hash array with length = LENGTH
+      for (i = 0; i < LENGTH; ++i) {
+        hash.push(ethers.utils.hexlify(ethers.utils.randomBytes(32)));
+      }
+      console.log(hash);
 
-      expect(await lock.unlockTime()).to.equal(unlockTime);
+      // register HALF different products
+      for (i = 0; i < HALF; i++) {
+        await expect(registry.register(type, hash[i])).not.to.be.reverted;
+        desiredResult.push(hash[i]);
+        // check the desired result
+        expect(await registry.query(type)).to.deep.equal(desiredResult);
+      }
+
+      // any hash whose index under HALF shouldn't be registed any more
+      for (i = 0; i < HALF; i++) {
+        await expect(registry.register(type, hash[i])).to.be.
+          revertedWith("Product has already been registered.");
+      }
+
+      // update HALF registed hash with another HALF one by one, check the result
+      for (i = 0; i < HALF; i++) {
+        await expect(registry.update(hash[i], hash[i + HALF])).not.to.be.reverted;
+        desiredResult[i] = hash[i + HALF];
+        expect(await registry.query(type)).to.deep.equal(desiredResult);
+      }
+      console.log(desiredResult);
+      // delist all existed product and other HALF non-existed product, 
+      // the latter should be reverted with certain message
+      for (i = HALF; i < LENGTH; i++) {
+        await expect(registry.delist(hash[i])).not.to.be.reverted;
+        desiredResult.shift();
+        expect(await registry.query(type)).to.deep.equal(desiredResult);
+      }
+
+      for (i = 0; i < LENGTH; i++) { // all products is delisted
+        await expect(registry.delist(hash[i])).to.be.revertedWith("Product doesn't exist.");
+      }
     });
 
-    it("Should set the right owner", async function () {
-      const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+    // it("Should be reverted when register a existed product", async function () {
 
-      expect(await lock.owner()).to.equal(owner.address);
-    });
+    // });
 
-    it("Should receive and store the funds to lock", async function () {
-      const { lock, lockedAmount } = await loadFixture(
-        deployOneYearLockFixture
-      );
 
-      expect(await ethers.provider.getBalance(lock.address)).to.equal(
-        lockedAmount
-      );
-    });
 
-    it("Should fail if the unlockTime is not in the future", async function () {
-      // We don't use the fixture here because we want a different deployment
-      const latestTime = await time.latest();
-      const Lock = await ethers.getContractFactory("Lock");
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-        "Unlock time should be in the future"
-      );
-    });
+
   });
 
   describe("Withdrawals", function () {
