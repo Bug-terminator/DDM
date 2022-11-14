@@ -1,0 +1,26 @@
+{
+    "message_type": "menu",
+    "payload": {
+        "list_of_available_data": [{
+            "data_type": "",
+            "data_size": ""
+        }],
+        "granularity": "",
+        "list_of_available_payment": [
+            "alipay",
+            "token"
+        ]
+    },
+    "signature": "signature of the seller",
+    "verification": ""
+}
+{
+    "message_type": "order",
+    "payload": {
+        "data_ID": "",
+        "payment": "",
+        
+    },
+    "signature": "signature of the seller",
+    "verification": ""
+}

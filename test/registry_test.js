@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Registry", async function () {
+describe("Registry", function () {
   
   async function deploy() {
     const signer = await ethers.getSigner();
@@ -14,7 +14,7 @@ describe("Registry", async function () {
     it("Should pass all the tests", async function () {
       const { registry } = await deploy();
       const type = '0x00';
-      const LENGTH = 10;
+      const LENGTH = 100;
       const HALF = LENGTH/2;
       let hash = [];
       let desiredResult = [];
@@ -46,6 +46,7 @@ describe("Registry", async function () {
         expect(await registry.query(type)).to.deep.equal(desiredResult);
       }
       console.log(desiredResult);
+      
       // delist all existed product and other HALF non-existed product, 
       // the latter should be reverted with certain message
       for (i = HALF; i < LENGTH; i++) {
