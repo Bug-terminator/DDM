@@ -1,26 +1,62 @@
 {
-    "message_type": "menu",
-    "payload": {
-        "list_of_available_data": [{
-            "data_type": "",
-            "data_size": ""
-        }],
-        "granularity": "",
-        "list_of_available_payment": [
-            "alipay",
-            "token"
-        ]
+    "hello": {
+        "message_type": "hello",
+        "payload": "public_key_of_the_buyer",
+        "signature": "",
+        "verification": ""
     },
-    "signature": "signature of the seller",
-    "verification": ""
-}
-{
-    "message_type": "order",
-    "payload": {
-        "data_ID": "",
-        "payment": "",
-        
+    "munu": {
+        "message_type": "menu",
+        "payload": {
+            "list_of_available_data": [
+                {
+                    "data_ID": "0",
+                    "data_size": "10000", 
+                    "data_info": "",
+                    "price": "100"
+                },
+                {
+                    "data_ID": "1",
+                    "data_size": "20000",
+                    "data_info": "",
+                    "price": "20"
+                }
+            ],
+            "granularity": "0.1",
+            "list_of_available_payment": [
+                "alipay",
+                "token"
+            ]
+        },
+        "signature": "signature of the seller",
+        "verification": ""
     },
-    "signature": "signature of the seller",
-    "verification": ""
+    "order":{
+        "message_type": "order",
+        "payload": {
+            "order_ID": "",
+            "data_ID": "",                       
+            "payment": ""
+        },
+        "signature": "signature of the buyer",
+        "verification": "transaction hash where the buyer has posted the order details"
+    },
+    "data": {
+        "message_type": "data",              
+        "payload": "data",                      
+        "signature": "signature of the seller",                 
+        "verification": ""               
+    },
+    "ACK": {
+        "message_type": "ACK",              
+        "payload": "ack",                      
+        "signature": "signature of the buyer",                 
+        "verification": "transaction hash where the payment has been made"               
+    },
+    "exit":{
+        "message_type": "exit",              
+        "payload": "rating each other",                      
+        "signature": "",                 
+        "verification": ""               
+    }
 }

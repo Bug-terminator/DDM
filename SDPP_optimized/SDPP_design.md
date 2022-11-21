@@ -29,6 +29,7 @@
     "is_finished"，							    // 订单是否结束
     “started_from",								 // 订单生成时间
     "deadline"                                   // 截止时间
+    ”item_ID“
 }
 ```
 
@@ -70,6 +71,7 @@
             "data_ID": "",                           // 商品ID(唯一)
             "data_size": ""							 // 数据大小
             ”data_info": ""						     // 数据描述信息
+            ”price“: ""                                // 数据价格
         }],
         "granularity": "",                           // 传输粒度
         "list_of_available_payment": [               // 支付方式
@@ -137,6 +139,48 @@
     "verification": ""               
 }
 ```
+
+# 模块设计
+
+## Buyer
+
+buyer分为三个模块：
+
+![](../image/buyer_module_diagram.png)
+
+#### Pseudo code：
+
+```python
+socket.connet(IP, port)
+while true:
+    receiveMenu()
+    placeOrder()
+    dataTransfer()
+socket.close()
+```
+
+## Seller
+
+seller也分为三个模块：
+
+![](SDPP_design.assets/seller_module_diagram.png)
+
+#### Pseudo code：
+
+```python
+server.bind(IP, Port)
+while true:
+    conn, addr = server.accept()
+    sendMenu()
+    receiveOrder()
+    dataTransfer()
+    conn.close()
+server.close()
+```
+
+## 数据流图
+
+![](SDPP_design.assets/dataflow_diagram.png)
 
 # 异常处理
 
