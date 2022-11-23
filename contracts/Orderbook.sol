@@ -70,4 +70,42 @@ contract Orderbook is IOrderbook {
         }
         info.is_finished = true;
     }
+
+    function getOrderbook(bytes32 order_id)
+        public
+        view
+        returns (OrderInfo memory info)
+    {
+        return orderBook[order_id];
+    }
+
+    function sellerVerifyOrderOnCreated(
+        bytes32 order_id,
+        address seller,
+        address buyer,
+        uint256 cost
+    ) public view returns (bool) {
+        OrderInfo memory order = orderBook[order_id];
+        return
+            order.seller == seller &&
+            order.buyer == buyer &&
+            order.cost == cost;
+    }
+
+    function sellerVerifyOrderOnPayment(
+        bytes32 order_id,
+        address seller,
+        address buyer,
+        uint256 cost,
+        uint256 finished
+    ) public view returns (bool) {
+        OrderInfo memory order = orderBook[order_id];
+        return
+            order.seller == seller &&
+            order.buyer == buyer &&
+            order.cost == cost &&
+            finished == order.finished_pieces;
+    }
+
+    function recieve() external payable {}
 }

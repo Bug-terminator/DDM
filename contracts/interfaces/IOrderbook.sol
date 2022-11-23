@@ -16,7 +16,6 @@ interface IOrderbook {
         uint256 deadline;
         uint256 cost;
         bool is_finished;
-        
     }
 
     function create(OrderInfo calldata info)
@@ -27,4 +26,7 @@ interface IOrderbook {
     function increase(bytes32 order_id) external;
 
     function settlement(bytes32 order_id) external;
+    function getOrderbook(bytes32 order_id) external view returns(OrderInfo memory info);
+    function sellerVerifyOrderOnCreated(bytes32 order_id, address seller, address buyer, uint256 cost) external view returns(bool);
+    function sellerVerifyOrderOnPayment(bytes32 order_id, address seller, address buyer, uint256 cost, uint256 finished) external view returns(bool);
 }

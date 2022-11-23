@@ -7,6 +7,7 @@ describe("Verifier", function () {
         const signer = await ethers.getSigner();
         const Verifier = await ethers.getContractFactory("Verifier");
         const verifier = await Verifier.deploy();
+        console.log(signer.address);
         return { verifier, signer };
     }
 
