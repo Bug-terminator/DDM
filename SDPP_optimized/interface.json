@@ -1,63 +1,72 @@
 {
-    "hello":{
-       "message_type":"hello",
-       "payload":"",
-       "signature":"",
-       "verification":""
+    "hello": {
+        "message_type": "hello",
+        "payload": "",
+        "signature": "",
+        "verification": ""
     },
-    "menu":{
-       "message_type":"menu",
-       "payload":{
-          "list_of_available_data":[
-             {
-                "item_ID":1,
-                "data_size":10000,
-                "data_info":"data1",
-                "price":1,
-                "granularity":0.2
-             },
-             {
-                "item_ID":2,
-                "data_size":20000,
-                "data_info":"data2",
-                "price":2,
-                "granularity":0.1
-             }
-          ],
-          "list_of_available_payment":[
-             "alipay",
-             "token"
-          ]
-       },
-       "signature":"",
-       "verification":""
+    "menu": {
+        "message_type": "menu",
+        "payload": {
+            "list_of_available_data": [
+                {
+                    "item_ID": 1,
+                    "data_size": 10000,
+                    "data_info": "data1",
+                    "price": 1,
+                    "granularity": 0.2
+                },
+                {
+                    "item_ID": 2,
+                    "data_size": 20000,
+                    "data_info": "data2",
+                    "price": 2,
+                    "granularity": 0.1
+                }
+            ],
+            "list_of_available_payment": [
+                "alipay",
+                "token"
+            ]
+        },
+        "signature": "",
+        "verification": ""
     },
-    "order":{
-       "message_type":"order",
-       "payload":{
-          "order_ID":"",
-          "item_ID":0,
-          "payment":""
-       },
-       "signature":"",
-       "verification":""
+    "order": {
+        "message_type": "order",
+        "payload": {
+            "order_ID": "",
+            "item_ID": 0,
+            "payment": ""
+        },
+        "signature": "",
+        "verification": ""
     },
-    "data":{
-       "message_type":"data",
-       "payload":"",
-       "signature":"",
-       "verification":""
+    "data": {
+        "message_type": "data",
+        "payload": "",
+        "signature": "",
+        "verification": ""
     },
-    "ACK":{
-       "message_type":"ACK",
-       "payload":"",
-       "signature":"",
-       "verification":""
+    "ACK": {
+        "message_type": "ACK",
+        "payload": "",
+        "signature": "",
+        "verification": ""
     },
-    "exit":{
-       "message_type":"exit",
-       "payload":"",
-       "signature":"",
-       "verification":""
+    "resume": {
+        "message_type": "resume",
+        "payload": {
+            "address": "",
+            "order_ID": ""
+        },
+        "signature": "",
+        "verification": ""
+    },
+    "exit": {
+        "message_type": "exit",
+        "payload": "",
+        "signature": "",
+        "verification": ""
     }
- }
+}

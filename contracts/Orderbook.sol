@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract Orderbook is IOrderbook {
     using SafeMath for uint256;
     mapping(bytes32 => OrderInfo) public orderBook;
-
+    mapping(address => mapping(address => bytes32)) public latestOrderLookUp;
     function create(OrderInfo memory info)
         public
         payable
@@ -35,6 +35,7 @@ contract Orderbook is IOrderbook {
         info.start_time = block.timestamp;
         info.deadline = info.start_time + 3 days;
         orderBook[order_id] = info;
+        latestOrderLookUp[msg.sender][info.seller] = order_id;
     }
 
     function increase(bytes32 order_id) public {
@@ -79,6 +80,10 @@ contract Orderbook is IOrderbook {
         return orderBook[order_id];
     }
 
+    function getLatestOrder(address buyer, address seller) public view returns (bytes32){
+        return latestOrderLookUp[buyer][seller];
+    }
+
     function sellerVerifyOrderOnCreated(
         bytes32 order_id,
         address seller,
@@ -86,6 +91,7 @@ contract Orderbook is IOrderbook {
         uint256 cost
     ) public view returns (bool) {
         OrderInfo memory order = orderBook[order_id];
+        require(order.finished_pieces == 0 && order.is_finished == false, "init error");
         return
             order.seller == seller &&
             order.buyer == buyer &&

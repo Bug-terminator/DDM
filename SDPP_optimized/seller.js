@@ -33,7 +33,9 @@ const server = tls.createServer(options, async function (socket) {
     var buyer_addr;
     var position = 0;
 
-    socket.write(JSON.stringify(interface.menu));
+    var hello = interface.hello;
+    hello.payload = signer.address;
+    socket.write(JSON.stringify(hello));
 
     // Print the data that we received 
     socket.on('data', async (data) => {
@@ -41,6 +43,51 @@ const server = tls.createServer(options, async function (socket) {
         data = JSON.parse(data);
 
         switch (data.message_type) {
+            case "hello":
+                socket.write(JSON.stringify(interface.menu));
+                break;
+            case "resume":
+                order_ID = data.payload.order_ID;
+                buyer_addr = (await orderbook.getOrderbook(order_ID)).buyer;
+                // var sig = ethers.utils.splitSignature(data.signature);
+                counter = (await orderbook.getOrderbook(order_ID)).finished_pieces;
+                data.signature = '';
+                // if (!await verify_signiture(verifier, ethers.utils.id(JSON.stringify(data)), sig, buyer_addr)) {
+                //     console.log("sig err");
+                //     break;
+                // } else { console.log("signature verification passed"); }
+                var item_ID = (await orderbook.getOrderbook(order_ID)).item_ID;
+                file_path = "./data/data" + item_ID + '.txt';
+                console.log("---------------", file_path);
+                list_of_available_data = interface.menu.payload.list_of_available_data;
+                list_of_available_data.forEach(element => {
+                    if (element.item_ID == item_ID) {
+                        file_size = element.data_size;
+                        price = element.price;
+                        granularity = element.granularity;
+                        total = 1 / granularity;
+                        buffer_size = Math.ceil(file_size / total);
+                    }
+                });
+
+                if(counter == total){
+                    console.log("order already finished");
+                    break;
+                }
+                buffer = Buffer.alloc(buffer_size);
+
+                var fd = fs.openSync(file_path);
+                fs.readSync(fd, buffer, 0, buffer_size, counter * buffer_size);
+                var real_data = interface.data;
+                real_data.payload = buffer.toString();
+                var signature = await sign_msg(signer, JSON.stringify(real_data));
+                // console.log(ethers.utils.splitSignature(signature));
+                real_data.signature = signature;
+                // console.log(real_data);
+                fs.closeSync(fd);
+                await sleep(1000);
+                socket.write(JSON.stringify(real_data));
+                break;
             case "order":
                 order_ID = data.payload.order_ID;
                 buyer_addr = (await orderbook.getOrderbook(order_ID)).buyer;

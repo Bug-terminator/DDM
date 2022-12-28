@@ -2,6 +2,7 @@ const tls = require('tls');
 const { ethers } = require("hardhat");
 const interface = require('./interface.json');
 const { sleep, fs, PORT, HOST, rl, options, $$, $, contract_addresses, provider, sign_msg, verify_signiture, verifier_abi, orderbook_abi } = require("./util");
+const res = require('express/lib/response');
 
 
 
@@ -22,7 +23,7 @@ var seller_addr;
 var order_ID;
 var counter = 0;
 var total = 0;
-const client = tls.connect(PORT, HOST, options,async function () {
+const client = tls.connect(PORT, HOST, options, async function () {
     console.log('buyer balance:', $(await signer.getBalance()));
     // Check if the authorization worked 
     // if (client.authorized) {
@@ -39,6 +40,20 @@ client.on("data", async (data) => {
     data = JSON.parse(data);
 
     switch (data.message_type) {
+        case "hello":
+            seller_addr = data.payload;
+            
+            rl.question("Resume? Enter y/n", async(answer)=>{
+                if(answer == 'y'){
+                    order_ID = await orderbook.getLatestOrder(signer.address, seller_addr);
+                    var resume = interface.resume;
+                    resume.payload.order_ID = order_ID;
+                    client.write(JSON.stringify(resume));
+                }else{
+                    client.write(JSON.stringify(interface.hello));
+                }
+            })
+            break;
         case "menu":
             var order = interface.order;
             rl.question('Input item_ID: \n', async (item_ID) => {
@@ -100,7 +115,7 @@ client.on("data", async (data) => {
             await sleep(1000);
             // console.log(answer);
             if (answer == 'y') {
-                
+
                 // fs.appendFile("down data.payload);
                 var fd = fs.openSync("download.txt", flags = "a+");
                 fs.writeSync(fd, data.payload);
