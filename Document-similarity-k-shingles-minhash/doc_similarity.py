@@ -581,171 +581,171 @@ print "\nCalculating Jaccard Similarity of Signatures took %.2fsec" % elapsed
 # pip install sortedcontainers
 # easy_install sortedcontainers
 
-while True:
-    try:
-        band_size = int(
-            raw_input("\nPlease enter the size of the band. Valid band rows are 1 - " + str(numHashes) + ": "))
-    except ValueError:
-        print("Your input is not valid.")
-        continue
-    if band_size <= 0 or band_size > numHashes:
-        print ("Your input is out of the defined range...")
-        continue
-    else:
-        break
+# while True:
+#     try:
+#         band_size = int(
+#             raw_input("\nPlease enter the size of the band. Valid band rows are 1 - " + str(numHashes) + ": "))
+#     except ValueError:
+#         print("Your input is not valid.")
+#         continue
+#     if band_size <= 0 or band_size > numHashes:
+#         print ("Your input is out of the defined range...")
+#         continue
+#     else:
+#         break
 
-t0 = time.time()
+# t0 = time.time()
 
-tlist = []
-for key, value in t.iteritems():
-    temp = value
-    tlist.append(temp)
-# print tlist
+# tlist = []
+# for key, value in t.iteritems():
+#     temp = value
+#     tlist.append(temp)
+# # print tlist
 
-# https://github.com/anthonygarvan/MinHash
-from random import randint, seed, choice, random
-import string
-import sys
-import itertools
-
-
-def get_band_hashes(minhash_row, band_size):
-    band_hashes = []
-    for i in range(len(minhash_row)):
-        if i % band_size == 0:
-            if i > 0:
-                band_hashes.append(band_hash)
-            band_hash = 0
-        band_hash += hash(minhash_row[i])
-    return band_hashes
+# # https://github.com/anthonygarvan/MinHash
+# from random import randint, seed, choice, random
+# import string
+# import sys
+# import itertools
 
 
-neighbors_of_given_documentLSH = {}
+# def get_band_hashes(minhash_row, band_size):
+#     band_hashes = []
+#     for i in range(len(minhash_row)):
+#         if i % band_size == 0:
+#             if i > 0:
+#                 band_hashes.append(band_hash)
+#             band_hash = 0
+#         band_hash += hash(minhash_row[i])
+#     return band_hashes
 
 
-def get_similar_docs(docs, shingles, threshold, n_hashes, band_size, collectIndexes=True):
-    t0 = time.time()
-    lshsignatures = {}
-    hash_bands = {}
-    random_strings = [str(random()) for _ in range(n_hashes)]
-    docNum = 0
-
-    # for key, value in t.iteritems():
-    #    temp = [key, doc]
-    #   tlist.append(temp)
-    w = 0
-    # for doc in docs.iteritems():
-    for doc in docs:
-
-        lshsignatures[w] = doc
-        # shingles = generate_shingles(doc, shingle_size)
-        # print 'doc', doc
-        # shingles = doc
-
-        minhash_row = doc
-        # print 'minhash_row', minhash_row, type(minhash_row)
-        band_hashes = get_band_hashes(minhash_row, band_size)
-        # print 'band_hashes', band_hashes
-        w = w + 1
-        docMember = docNum if collectIndexes else doc
-        for i in range(len(band_hashes)):
-            if i not in hash_bands:
-                hash_bands[i] = {}
-            if band_hashes[i] not in hash_bands[i]:
-                hash_bands[i][band_hashes[i]] = [docMember]
-            else:
-                hash_bands[i][band_hashes[i]].append(docMember)
-        docNum += 1
-
-    similar_docs = set()
-    similarity1 = []
-    noPairs = 0
-    print 'Comparing Signatures Found in the Same Buckets During LSH ...'
-    # print "\n    Jaccard similarity After LSH\n"
-    # print "    Pairs          Similarity"
-    samebucketLSH = []
-    samebucketcnt = 0
-    for i in hash_bands:
-        for hash_num in hash_bands[i]:
-            if len(hash_bands[i][hash_num]) > 1:
-                for pair in itertools.combinations(hash_bands[i][hash_num], r=2):
-                    if pair not in similar_docs:
-                        similar_docs.add(pair)
-                        if pair[0] == docid and pair[1] != docid:
-
-                            s1 = set(lshsignatures[pair[0]])
-                            s2 = set(lshsignatures[pair[1]])
-
-                            sim = len(s1.intersection(s2)) / float(len(s1.union(s2)))
-                            if (float(sim) > threshold):
-                                percsim = sim * 100
-                                # print  "  %5s --> %5s   %.2f%s" % (pair[0], pair[1], percsim,'%')
-                                noPairs = noPairs + 1
-                                # return similar texts
-
-                                # print 'TEXT WITH ID: ', pair[0], '\n AND BODY: ', body[pair[0]], '\n IS ', sim*100, '% SIMILAR TO', '\n TEXT WITH ID: ', pair[1], '\n AND BODY: ', body[pair[1]], '\n'
-                            else:
-                                percsim = 0
-                            neighbors_of_given_documentLSH[pair[1]] = percsim
-                            samebucketLSH.append(pair[1])
-                            samebucketcnt = samebucketcnt + 1
-                            elapsed = (time.time() - t0)
-
-    print 'Number of false positives while comparing signatures which were found in the same bucket',
-    sorted_neigborsLSH = sorted(neighbors_of_given_documentLSH.items(), key=lambda x: x[1], reverse=True)
-    # print "Sorted Neighbors Signatures", sorted_neigbors, "%"
-
-    lshpos = []
-    print 'Comparing Signatures Found in the Same Bucket During LSH...'
-    print "The " + str(neighbors) + " closest neighbors of document " + str(docid) + " are:"
-    for i in range(0, neighbors):
-        if i >= len(sorted_neigborsLSH):
-            break
-        if sorted_neigborsLSH[i][1] > 0:
-            print "\nChosen Signatures (After LSH) of Document " + str(sorted_neigborsLSH[i][0]) + " with Jaccard Similarity " + str(round(sorted_neigborsLSH[i][1], 2)) + "%"
-            print "\nBody of document " + str(sorted_neigborsLSH[i][0]) + "\n" + str(printedbodies[sorted_neigborsLSH[i][0]])
-            lshpos.append(sorted_neigborsLSH[i][0])
-
-    neighborsfplsh = neighbors - len(list(set(tp).intersection(lshpos)))
-    neighborstplsh = neighbors - neighborsfplsh
-    # totalfplsh =
-    totaltplsh = len(list(set(tp).intersection(samebucketLSH)))
-    totalfplsh = samebucketcnt - totaltplsh
-
-    print '\nEvaluating the', neighbors, 'neighbors produced by LSH...'
-    print neighborstplsh, 'out of', neighbors, 'TP and', neighborsfplsh, 'out of', neighbors, 'FP'
-    print '\nEvaluating the', samebucketcnt, 'pairs which fell in the same bucket...'
-
-    if samebucketcnt > 0:
-        prctpLSH = round((totaltplsh / float(samebucketcnt)) * 100, 2)
-        prcfpLSH = 100 - prctpLSH
-        print totaltplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are TP', prctpLSH, '%'
-        print totalfplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are FP', prcfpLSH, '%'
-    else:
-        print totaltplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are TP'
-        print totalfplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are FP'
-
-    return similar_docs
+# neighbors_of_given_documentLSH = {}
 
 
-# Report how long shingling took.
+# def get_similar_docs(docs, shingles, threshold, n_hashes, band_size, collectIndexes=True):
+#     t0 = time.time()
+#     lshsignatures = {}
+#     hash_bands = {}
+#     random_strings = [str(random()) for _ in range(n_hashes)]
+#     docNum = 0
 
-n_hashes = numHashes
+#     # for key, value in t.iteritems():
+#     #    temp = [key, doc]
+#     #   tlist.append(temp)
+#     w = 0
+#     # for doc in docs.iteritems():
+#     for doc in docs:
 
-n_similar_docs = 2
-seed(42)
+#         lshsignatures[w] = doc
+#         # shingles = generate_shingles(doc, shingle_size)
+#         # print 'doc', doc
+#         # shingles = doc
 
-finalshingles = docsAsShingleSets
-# print 'docs', docs, type(docs)
-# print tlist
-# print docs, type(docs)
-# print signatures, type(signatures)
+#         minhash_row = doc
+#         # print 'minhash_row', minhash_row, type(minhash_row)
+#         band_hashes = get_band_hashes(minhash_row, band_size)
+#         # print 'band_hashes', band_hashes
+#         w = w + 1
+#         docMember = docNum if collectIndexes else doc
+#         for i in range(len(band_hashes)):
+#             if i not in hash_bands:
+#                 hash_bands[i] = {}
+#             if band_hashes[i] not in hash_bands[i]:
+#                 hash_bands[i][band_hashes[i]] = [docMember]
+#             else:
+#                 hash_bands[i][band_hashes[i]].append(docMember)
+#         docNum += 1
+
+#     similar_docs = set()
+#     similarity1 = []
+#     noPairs = 0
+#     print 'Comparing Signatures Found in the Same Buckets During LSH ...'
+#     # print "\n    Jaccard similarity After LSH\n"
+#     # print "    Pairs          Similarity"
+#     samebucketLSH = []
+#     samebucketcnt = 0
+#     for i in hash_bands:
+#         for hash_num in hash_bands[i]:
+#             if len(hash_bands[i][hash_num]) > 1:
+#                 for pair in itertools.combinations(hash_bands[i][hash_num], r=2):
+#                     if pair not in similar_docs:
+#                         similar_docs.add(pair)
+#                         if pair[0] == docid and pair[1] != docid:
+
+#                             s1 = set(lshsignatures[pair[0]])
+#                             s2 = set(lshsignatures[pair[1]])
+
+#                             sim = len(s1.intersection(s2)) / float(len(s1.union(s2)))
+#                             if (float(sim) > threshold):
+#                                 percsim = sim * 100
+#                                 # print  "  %5s --> %5s   %.2f%s" % (pair[0], pair[1], percsim,'%')
+#                                 noPairs = noPairs + 1
+#                                 # return similar texts
+
+#                                 # print 'TEXT WITH ID: ', pair[0], '\n AND BODY: ', body[pair[0]], '\n IS ', sim*100, '% SIMILAR TO', '\n TEXT WITH ID: ', pair[1], '\n AND BODY: ', body[pair[1]], '\n'
+#                             else:
+#                                 percsim = 0
+#                             neighbors_of_given_documentLSH[pair[1]] = percsim
+#                             samebucketLSH.append(pair[1])
+#                             samebucketcnt = samebucketcnt + 1
+#                             elapsed = (time.time() - t0)
+
+#     print 'Number of false positives while comparing signatures which were found in the same bucket',
+#     sorted_neigborsLSH = sorted(neighbors_of_given_documentLSH.items(), key=lambda x: x[1], reverse=True)
+#     # print "Sorted Neighbors Signatures", sorted_neigbors, "%"
+
+#     lshpos = []
+#     print 'Comparing Signatures Found in the Same Bucket During LSH...'
+#     print "The " + str(neighbors) + " closest neighbors of document " + str(docid) + " are:"
+#     for i in range(0, neighbors):
+#         if i >= len(sorted_neigborsLSH):
+#             break
+#         if sorted_neigborsLSH[i][1] > 0:
+#             print "\nChosen Signatures (After LSH) of Document " + str(sorted_neigborsLSH[i][0]) + " with Jaccard Similarity " + str(round(sorted_neigborsLSH[i][1], 2)) + "%"
+#             print "\nBody of document " + str(sorted_neigborsLSH[i][0]) + "\n" + str(printedbodies[sorted_neigborsLSH[i][0]])
+#             lshpos.append(sorted_neigborsLSH[i][0])
+
+#     neighborsfplsh = neighbors - len(list(set(tp).intersection(lshpos)))
+#     neighborstplsh = neighbors - neighborsfplsh
+#     # totalfplsh =
+#     totaltplsh = len(list(set(tp).intersection(samebucketLSH)))
+#     totalfplsh = samebucketcnt - totaltplsh
+
+#     print '\nEvaluating the', neighbors, 'neighbors produced by LSH...'
+#     print neighborstplsh, 'out of', neighbors, 'TP and', neighborsfplsh, 'out of', neighbors, 'FP'
+#     print '\nEvaluating the', samebucketcnt, 'pairs which fell in the same bucket...'
+
+#     if samebucketcnt > 0:
+#         prctpLSH = round((totaltplsh / float(samebucketcnt)) * 100, 2)
+#         prcfpLSH = 100 - prctpLSH
+#         print totaltplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are TP', prctpLSH, '%'
+#         print totalfplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are FP', prcfpLSH, '%'
+#     else:
+#         print totaltplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are TP'
+#         print totalfplsh, 'out of', samebucketcnt, 'documents which fell in the same bucket are FP'
+
+#     return similar_docs
 
 
-similar_docs = get_similar_docs(signatures, finalshingles, threshold, n_hashes, band_size, collectIndexes=True)
+# # Report how long shingling took.
 
-print '\nLocality Sensitive Hashing ' + str(len(signatures)) + ' docs took %.2f sec.' % (time.time() - t0)
+# n_hashes = numHashes
+
+# n_similar_docs = 2
+# seed(42)
+
+# finalshingles = docsAsShingleSets
+# # print 'docs', docs, type(docs)
+# # print tlist
+# # print docs, type(docs)
+# # print signatures, type(signatures)
 
 
-r = float(n_hashes / band_size)
-similarity = (1 / r) ** (1 / float(band_size))
+# similar_docs = get_similar_docs(signatures, finalshingles, threshold, n_hashes, band_size, collectIndexes=True)
+
+# print '\nLocality Sensitive Hashing ' + str(len(signatures)) + ' docs took %.2f sec.' % (time.time() - t0)
+
+
+# r = float(n_hashes / band_size)
+# similarity = (1 / r) ** (1 / float(band_size))
