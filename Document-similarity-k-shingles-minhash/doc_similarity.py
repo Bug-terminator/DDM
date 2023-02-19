@@ -10,10 +10,10 @@ import binascii
 
 documents = []
 printedbodies = {}
-print 'Reading files'
-print 'Please wait...'
+# print 'Reading files'
+# print 'Please wait...'
 t0 = time.time()
-
+print "Pulling data from the blockchain, please wait a minute......"
 data = ''
 
 for file in os.listdir("data/"):
@@ -23,9 +23,9 @@ for file in os.listdir("data/"):
         f = open(filename, 'r')
         data = data + f.read()
 
-print 'Reading data took %.2f sec.' % (time.time() - t0)
+# print 'Reading data took %.2f sec.' % (time.time() - t0)
 
-print 'Transforming data...'
+# print 'Transforming data...'
 t0 = time.time()
 soup = BeautifulSoup(data, "html.parser")
 bodies = soup.findAll('body')
@@ -37,9 +37,9 @@ for body in bodies:
                .replace("", "").replace("\n", " ").lower()))
     i = i + 1
 
-print 'Transforming data took %.2f sec.' % (time.time() - t0)
+# print 'Transforming data took %.2f sec.' % (time.time() - t0)
 
-print 'The number of documents read was: ' + str(len(documents))
+# print 'The number of documents read was: ' + str(len(documents))
 
 i = 0
 d = {}
@@ -72,18 +72,17 @@ docNames = []
 totalShingles = 0
 shingleNo = 0
 ######Ask user to give a value for k
-while True:
-    try:
-        shingle_size = int(raw_input("Please enter k value for k-shingles: "))
-    except ValueError:
-        print("Your input is not valid. Give a positive natural number > 0...")
-        continue
-    if shingle_size <= 0:
-        continue
-    else:
-        break
-
-print "Shingling articles..."
+# while True:
+#     try:
+#         shingle_size = int(raw_input("Please enter k value for k-shingles: "))
+#     except ValueError:
+#         print("Your input is not valid. Give a positive natural number > 0...")
+#         continue
+#     if shingle_size <= 0:
+#         continue
+#     else:
+#         break
+shingle_size = 4
 
 t0 = time.time()
 # loop through all the documents
@@ -137,11 +136,11 @@ for i in range(0, len(d)):
 
 totalShingles = shingleNo
 
-print 'Total Number of Shingles', shingleNo
+# print 'Total Number of Shingles', shingleNo
 # Report how long shingling took.
-print '\nShingling ' + str(len(docsAsShingleSets)) + ' docs took %.2f sec.' % (time.time() - t0)
+# print '\nShingling ' + str(len(docsAsShingleSets)) + ' docs took %.2f sec.' % (time.time() - t0)
 
-print '\nAverage shingles per doc: %.2f' % (shingleNo / len(docsAsShingleSets))
+# print '\nAverage shingles per doc: %.2f' % (shingleNo / len(docsAsShingleSets))
 
 # =============================================================================
 #                     Define Triangle Matrices
@@ -155,6 +154,7 @@ print '\nAverage shingles per doc: %.2f' % (shingleNo / len(docsAsShingleSets))
 # the empty/invalid cells of a full matrix.
 
 # Calculate the number of elements needed in our triangle matrix
+
 numElems = int(len(docsAsShingleSets) * (len(docsAsShingleSets) - 1) / 2)
 
 # Initialize two empty lists to store the similarity values.
@@ -188,19 +188,19 @@ def getTriangleIndex(i, j):
     return k
 
 
-######Ask user to give a value for hash functions to be used
-while True:
-    try:
-        numHashes = int(raw_input("\nPlease enter how many hash functions you want to be used: "))
-    except ValueError:
-        print("Your input is not valid. Give a positive natural number > 0...")
-        continue
-    if numHashes <= 0:
-        continue
-    else:
-        break
-
-print '\nGenerating random hash functions...'
+# ######Ask user to give a value for hash functions to be used
+# while True:
+#     try:
+#         numHashes = int(raw_input("\nPlease enter how many hash functions you want to be used: "))
+#     except ValueError:
+#         print("Your input is not valid. Give a positive natural number > 0...")
+#         continue
+#     if numHashes <= 0:
+#         continue
+#     else:
+#         break
+numHashes = 15
+# print '\nGenerating random hash functions...'
 
 # =============================================================================
 #                 Generate MinHash Signatures
@@ -285,7 +285,7 @@ i = 1
 # print 'Total number of shingles = ', shingleNo
 while not MillerRabinPrimalityTest(shingleNo + i):
     i = i + 1
-print 'Next prime = ', shingleNo + i
+# print 'Next prime = ', shingleNo + i
 
 maxShingleID = shingleNo
 nextPrime = shingleNo + i
@@ -322,7 +322,7 @@ def pickRandomCoeffs(k):
 coeffA = pickRandomCoeffs(numHashes)
 coeffB = pickRandomCoeffs(numHashes)
 
-print '\nGenerating MinHash signatures for all documents...'
+
 
 # List of documents represented as signature vectors
 signatures = []
@@ -376,7 +376,7 @@ numDocs = len(signatures)
 while True:
     try:
         docid = int(raw_input(
-            "Please enter the document id you are interested in. The valid document ids are 1 - " + str(
+            "Please chose the document id you are want to upload. The valid document ids are 1 - " + str(
                 numDocs) + ": "))
     except ValueError:
         print("Your input is not valid.")
@@ -398,7 +398,7 @@ while True:
         continue
     else:
         break
-
+print '\nGenerating MinHash signatures for this document, please wait a minute......'
 # =============================================================================
 #                 Calculate Jaccard Similarities
 # =============================================================================

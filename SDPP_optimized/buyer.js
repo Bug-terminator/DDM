@@ -47,6 +47,7 @@ client.on("data", async (data) => {
                 if(answer == 'y'){
                     order_ID = await orderbook.getLatestOrder(signer.address, seller_addr);
                     var resume = interface.resume;
+                    counter = 1;
                     resume.payload.order_ID = order_ID;
                     client.write(JSON.stringify(resume));
                 }else{
