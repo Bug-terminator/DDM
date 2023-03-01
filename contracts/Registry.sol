@@ -51,11 +51,11 @@ contract Registry is IRegistry {
     }
 
     function update(bytes32 old_hash, bytes32 new_hash) public {
-        require(sellerLookUp[old_hash] != address(0), "Product doesn't exist.");
-        require(
-            sellerLookUp[old_hash] == msg.sender,
-            "Only seller is allowed to update the product info."
-        );
+        // require(sellerLookUp[old_hash] != address(0), "Product doesn't exist.");
+        // require(
+        //     sellerLookUp[old_hash] == msg.sender,
+        //     "Only seller is allowed to update the product info."
+        // );
         (bytes1 class, uint256 index) = fetchPosition(old_hash);
         productLookUp[class][index].storage_hash = new_hash;
         sellerLookUp[old_hash] = address(0);
@@ -66,10 +66,10 @@ contract Registry is IRegistry {
 
     function delist(bytes32 hash) public {
         require(sellerLookUp[hash] != address(0), "Product doesn't exist.");
-        require(
-            sellerLookUp[hash] == msg.sender,
-            "Only seller is allowed to delist the product."
-        );
+        // require(
+        //     sellerLookUp[hash] == msg.sender,
+        //     "Only seller is allowed to delist the product."
+        // );
         (bytes1 class, uint256 index) = fetchPosition(hash);
         productLookUp[class][index].is_valid = false;
         sellerLookUp[hash] = address(0);
@@ -89,7 +89,71 @@ contract Registry is IRegistry {
         returns (bytes1 class, uint256 index)
     {
         index = positionLookUp[hash].position - 1;
-        require(index >= 0, "Index shouldn't be negative");
+        // require(index >= 0, "Index shouldn't be negative");
         class = positionLookUp[hash].class;
     }
 }
+
+
+// pragma solidity ^0.8.0;
+
+// contract ProductRegistry {
+//     struct Product {
+//         uint256 hash;
+//         int8 valid;
+//     }
+
+//     Product[] public productList;
+//     mapping(uint256 => uint256) public productIndexMap;
+
+//     function addProduct(uint256 hash) public {
+//         // 如果产品的哈希值已存在，则不进行任何操作
+//         if (productIndexMap[hash] != 0) {
+//             return;
+//         }
+
+//         // 创建一个新产品并添加到productList数组的末尾
+//         Product memory newProduct = Product({hash: hash, valid: 1});
+//         uint256 index = productList.length;
+//         productList.push(newProduct);
+
+//         // 将产品哈希值与其在productList数组中的位置建立映射
+//         productIndexMap[hash] = index;
+//     }
+
+//     function removeProduct(uint256 hash) public {
+//         // 如果产品的哈希值不存在或已被删除，则不进行任何操作
+//         uint256 index = productIndexMap[hash];
+//         if (index == 0 || productList[index - 1].valid != 1) {
+//             return;
+//         }
+
+//         // 将产品的valid字段的第一位设置为0，表示已被删除
+//         productList[index - 1].valid &= ~1;
+
+//         // 从productIndexMap映射中删除对应的项
+//         delete productIndexMap[hash];
+//     }
+
+//     function getProducts() public view returns (uint256[] memory) {
+//         // 统计所有valid产品的数量
+//         uint256 validCount = 0;
+//         for (uint256 i = 0; i < productList.length; i++) {
+//             if (productList[i].valid == 1) {
+//                 validCount++;
+//             }
+//         }
+
+//         // 创建一个数组以保存所有valid产品的哈希值
+//         uint256[] memory validProducts = new uint256[](validCount);
+//         uint256 validIndex = 0;
+//         for (uint256 i = 0; i < productList.length; i++) {
+//             if (productList[i].valid == 1) {
+//                 validProducts[validIndex] = productList[i].hash;
+//                 validIndex++;
+//             }
+//         }
+
+//         return validProducts;
+//     }
+// }

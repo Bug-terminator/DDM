@@ -176,6 +176,7 @@ const server = tls.createServer(options, async function (socket) {
 });
 // Start listening on a specific port and address 
 server.listen(PORT, HOST, function () {
+    console.log(provider)
     console.log("I'm listening at %s, on port %s", HOST, PORT);
 });
 // When an error occurs, show it. 
@@ -185,3 +186,4 @@ server.on('error', function (error, socket) {
     // Close the connection after the error occurred. 
     // server.destroy();
 }); 
+console.log()

@@ -19,7 +19,8 @@
   "homepage": "https://github.com/Bug-terminator/DDM#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
-    "hardhat": "^2.12.1"
+    "hardhat": "^2.12.1",
+    "solidity-coverage": "^0.8.2"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.0",

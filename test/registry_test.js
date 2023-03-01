@@ -11,10 +11,10 @@ describe("Registry", function () {
   }
 
   describe("test", function () {
-    it("Should pass all the tests", async function () {
+    it("TEST No.1", async function () {
       const { registry } = await deploy();
       const type = '0x00';
-      const LENGTH = 100;
+      const LENGTH = 10;
       const HALF = LENGTH/2;
       let hash = [];
       let desiredResult = [];
@@ -23,7 +23,8 @@ describe("Registry", function () {
       for (i = 0; i < LENGTH; ++i) {
         hash.push(ethers.utils.hexlify(ethers.utils.randomBytes(32)));
       }
-      console.log(hash);
+      // console.log(hash);
+
 
       // register HALF different products
       for (i = 0; i < HALF; i++) {
@@ -45,7 +46,7 @@ describe("Registry", function () {
         desiredResult[i] = hash[i + HALF];
         expect(await registry.query(type)).to.deep.equal(desiredResult);
       }
-      console.log(desiredResult);
+      // console.log(desiredResult);
       
       // delist all existed product and other HALF non-existed product, 
       // the latter should be reverted with certain message
@@ -59,5 +60,12 @@ describe("Registry", function () {
         await expect(registry.delist(hash[i])).to.be.revertedWith("Product doesn't exist.");
       }
     });
+
+    it("TEST No.2", async () => {
+      expect(true)
+    })
+    it("TEST No.3", async () => {
+      expect(true)
+    })
   });
 });

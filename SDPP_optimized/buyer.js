@@ -23,6 +23,7 @@ var seller_addr;
 var order_ID;
 var counter = 0;
 var total = 0;
+console.log()
 const client = tls.connect(PORT, HOST, options, async function () {
     console.log('buyer balance:', $(await signer.getBalance()));
     // Check if the authorization worked 
