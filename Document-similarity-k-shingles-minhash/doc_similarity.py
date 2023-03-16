@@ -375,7 +375,7 @@ numDocs = len(signatures)
 ######Ask user to choose a document
 while True:
     try:
-        docid = int(raw_input(
+        docid = int(    (
             "Please chose the document id you are want to upload. The valid document ids are 1 - " + str(
                 numDocs) + ": "))
     except ValueError:
