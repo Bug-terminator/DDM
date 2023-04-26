@@ -90,7 +90,6 @@ const main = async () => {
       if (uniqueness < threshold_low) {
         is_plagiarizm = true;
       }
-
       const doc_id = await upload(metadataContents, is_plagiarizm);
       await redisClient.set(doc_id.toString(), JSON.stringify(minHash));
 
